@@ -1,0 +1,8 @@
+{
+  "ticker": "^GSPC",
+  "start": "2000-01-01",
+  "end_exclusive": "2026-10-13",
+  "downloaded_utc": "2026-10-13T19:24:17.838536+00:00",
+  "yfinance_version": "1.7.0",
+  "sha256": "9d7662fcb9cfa1b95376d369586c34a6df596aed2205bb5cbe4850de1f367754"
+}
