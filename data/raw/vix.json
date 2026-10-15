@@ -1,0 +1,8 @@
+{
+  "ticker": "^VIX",
+  "start": "2000-01-01",
+  "end_exclusive": "2026-10-13",
+  "downloaded_utc": "2026-10-13T19:24:19.146491+00:00",
+  "yfinance_version": "1.7.0",
+  "sha256": "3630bff6530bb75d7bbc051e52a99b160239cde4945189cb2fa3751c1a9fdbab"
+}

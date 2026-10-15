@@ -1,0 +1,8 @@
+{
+  "ticker": "^GSPTSE",
+  "start": "2000-01-01",
+  "end_exclusive": "2026-10-13",
+  "downloaded_utc": "2026-10-13T19:24:18.449822+00:00",
+  "yfinance_version": "1.7.0",
+  "sha256": "b86884868ea762f34319a179086553509b738809ca7085e0db88af9fe2270c53"
+}
