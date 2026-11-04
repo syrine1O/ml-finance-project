@@ -6,8 +6,8 @@ Sinon on utiliserait le futur (look-ahead).
 | Variable | Définition | Connue à la clôture de t ? |
 |---|---|---|
 | rv_d | rv du jour t | Oui |
-| rv_w | moyenne de rv sur les 5 derniers jours | Oui |
-| rv_m | moyenne de rv sur les 22 derniers jours | Oui |
+| rv_w | moyenne de rv de t-4 à t (5 jours) | Oui |
+| rv_m | moyenne de rv de t-21 à t (22 jours) | Oui |
 | ret | rendement du jour t, en % | Oui |
 | ret_neg | min(ret, 0), seulement les jours de baisse | Oui |
 | vix | niveau du VIX à la clôture de t | Oui |
