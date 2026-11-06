@@ -37,3 +37,20 @@ def dm_test(y, f1, f2, h=1, loss="qlike"):
     d = loss_series(y, f1, loss) - loss_series(y, f2, loss)
     res = sm.OLS(d, np.ones(len(d))).fit(cov_type="HAC", cov_kwds={"maxlags": h})
     return float(res.tvalues[0]), float(res.pvalues[0])
+
+def evaluate(index, benchmark="HAR"):
+    """Tableau : QLIKE, MSE et Diebold-Mariano contre le benchmark, par modèle et horizon."""
+    fc = load_all_forecasts(index)
+    rows = []
+    for h, g in fc.groupby("horizon"):
+        # la colonne actual doit être la même pour tous les modèles à une date donnée
+        ecart = g.groupby("date")["actual"].agg(lambda s: s.max() - s.min()).max()
+        assert ecart < 1e-9, f"actual différent entre modèles (h = {h})"
+        wide = g.pivot(index="date", columns="model", values="forecast").dropna(axis=1, how="all").dropna()
+        y = g.drop_duplicates("date").set_index("date").loc[wide.index, "actual"]
+        for m in wide.columns:
+            t, p = dm_test(y, wide[m], wide[benchmark], h) if m != benchmark else (np.nan, np.nan)
+            rows.append({"horizon": h, "model": m, "QLIKE": qlike(y, wide[m]),
+                         "MSE": mse(y, wide[m]), "DM vs " + benchmark: t, "p-value": p})
+    return pd.DataFrame(rows).round(4)
+    
