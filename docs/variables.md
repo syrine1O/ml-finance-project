@@ -88,8 +88,6 @@ Ces contrôles valident la construction temporelle du notebook sur les fichiers 
 
 ## 8. Relancer le notebook
 
-Depuis le dossier `notebooks`, le notebook utilise `../data`. Depuis la racine du dépôt, il utilise `data`. Aucun chemin personnel `/content/spx.csv` n’est imposé.
-
-Dans Colab, si les deux fichiers sources sont absents, le notebook propose leur import et les enregistre dans un dossier `data`. Exécuter les cellules dans l’ordre pour créer les variables, contrôler les calculs, afficher les corrélations et exporter les deux fichiers. La dernière cellule permet de télécharger les CSV depuis Colab.
-
-Les résultats de cette documentation proviennent d’une exécution du notebook corrigé sur les sources fournies. Le SPX a été récupéré dans le tableau `rawLines` complet de la page GitHub HTML transmise, contenant 6 734 lignes dont l’en-tête. Le fichier TSX transmis sous le nom `tsx 2.csv` a été utilisé comme `tsx.csv`, sans changement des données.
+1. Ouvrir `notebooks/05a_features.ipynb` dans Google Colab.
+2. Mettre à disposition les données nécessaires aux chemins indiqués dans le notebook.
+3. Exécuter les cellules dans l’ordre pour régénérer les variables et les fichiers CSV.
