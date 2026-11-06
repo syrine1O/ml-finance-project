@@ -1,51 +1,58 @@
-# T5 — Construction des variables et des cibles
+# T5 Construction des variables et des cibles SPX et TSX
 
-## 1. Objectif
+## 1. Objectif et fichiers
 
-Construire les variables explicatives et les cibles nécessaires à la prévision de la volatilité réalisée des indices S&P 500 (SPX) et S&P/TSX (TSX), aux horizons de 1, 5 et 22 jours de bourse.
+Préparer les variables explicatives et les cibles des indices S&P 500 (SPX) et S&P/TSX (TSX), aux horizons de 1, 5 et 22 séances. Le notebook `notebooks/05a_features.ipynb` lit `data/spx.csv` et `data/tsx.csv`, puis écrit `data/features_spx.csv` et `data/features_tsx.csv`.
 
-Les données préparées sont enregistrées dans :
-- data/features_spx.csv
-- data/features_tsx.csv
+Une seule documentation réunit ici les définitions et le tableau des variables de l’équipe. Toutes les variables explicatives doivent être connues à la clôture de la séance t. Les cibles correspondent aux séances strictement suivantes et ne servent jamais de variables explicatives.
 
-## 2. Variables explicatives
+## 2. Données et convention temporelle
 
-- rv_d : volatilité réalisée quotidienne, disponible à la date t.
-- rv_w : moyenne de la volatilité réalisée sur les cinq derniers jours de bourse, date t incluse.
-- rv_m : moyenne de la volatilité réalisée sur les 22 derniers jours de bourse, date t incluse.
-- ret : rendement de l'indice à la date t.
-- ret_neg : composante négative du rendement, définie comme min(ret, 0).
-- vix : indice VIX, indicateur des anticipations de volatilité du marché américain.
+Les lignes sont triées chronologiquement. `Date` est la date d’information t, conservée comme index du tableau et comme première colonne des CSV. Les horizons désignent des observations successives de chaque marché, et non des jours calendaires. Les calendriers SPX et TSX peuvent différer.
 
-Les variables rv_d, rv_w et rv_m correspondent aux composantes quotidiennes, hebdomadaires et mensuelles utilisées dans l'approche HAR.
+Les fichiers sources fournissent `rv`, `ret` et `vix`. La préparation conserve leur définition et leur échelle. En particulier, elle ne transforme pas `rv` par racine carrée et ne modifie pas son annualisation : sa construction relève de la préparation des données sources. `ret` est exprimé en pourcentage selon la convention de l’équipe.
 
-## 3. Variables cibles
+## 3. Variables explicatives
 
-- y_h1 : volatilité réalisée du prochain jour de bourse.
-- y_h5 : moyenne de la volatilité réalisée des cinq prochains jours de bourse.
-- y_h22 : moyenne de la volatilité réalisée des 22 prochains jours de bourse.
+| Variable | Définition à t | Connue à la clôture de t ? |
+|---|---|---|
+| `rv_d` | `rv` de la séance t | Oui, sous réserve de la disponibilité des données sources |
+| `rv_w` | Moyenne de `rv` de t−4 à t, soit 5 observations | Oui |
+| `rv_m` | Moyenne de `rv` de t−21 à t, soit 22 observations | Oui |
+| `ret` | Rendement de la séance t, en % | Oui |
+| `ret_neg` | `min(ret, 0)`, nul en l’absence de rendement négatif | Oui |
+| `vix` | Niveau du VIX de la séance t fourni dans les données | Oui, sous réserve de la disponibilité et de l’alignement des clôtures |
+| `vix_diff` | VIX à t moins VIX à l’observation précédente disponible | Oui, sous la même réserve |
 
-Les cibles sont calculées uniquement avec les observations futures. Elles ne sont jamais utilisées comme variables explicatives.
+`vix_diff` se calcule avec `data["vix"].diff()` après tri et indexation des dates. Il mesure une variation en points de VIX, et non une variation relative en pourcentage. Les sept variables figurent dans les deux fichiers de variables.
 
-## 4. Prévention des fuites d'information
+### Motivation financière
 
-Les données sont triées chronologiquement.
+Les composantes quotidienne, hebdomadaire et mensuelle de `rv` décrivent la persistance de la mesure réalisée et constituent les composantes historiques de l’approche HAR. `ret_neg` permet de représenter une éventuelle asymétrie entre les baisses et les hausses. Le VIX renseigne sur les anticipations de volatilité du marché américain, y compris lorsqu’il sert de variable explicative du TSX. Sa variation `vix_diff` décrit les changements de cet indicateur. Ces motivations ne constituent pas une preuve de causalité ou de performance prédictive.
 
-À la date t :
-- rv_w utilise les dates t-4 à t.
-- rv_m utilise les 22 dernières observations connues.
-- y_h5 utilise les dates t+1 à t+5.
-- y_h22 utilise les dates t+1 à t+22.
+## 4. Cibles futures
 
-Les tests anti-fuite ont réussi pour SPX et TSX sur la date vérifiée dans le notebook.
+| Cible | Définition à la date d’information t | Disponible à la clôture de t ? |
+|---|---|---|
+| `y_h1` | `rv` à t+1 | Non |
+| `y_h5` | Moyenne de `rv` de t+1 à t+5 | Non |
+| `y_h22` | Moyenne de `rv` de t+1 à t+22 | Non |
 
-La séparation entraînement/test respecte l'ordre chronologique : 80 % des observations pour l'entraînement et 20 % pour le test.
+La formule commune est `data["rv"].rolling(h).mean().shift(-h)`, pour h égal à 1, 5 ou 22. Le décalage aligne chaque moyenne strictement future sur la date t. Aucune cible n’inclut la valeur de `rv` à t.
 
-Pour éviter une contamination aux frontières des périodes, il faut également vérifier que les cibles d'entraînement ne s'étendent pas sur la période de test, notamment pour les horizons de 5 et 22 jours.
+Le tableau commun retire les lignes incomplètes sur toutes les colonnes avec `dropna()`. Avec les sources fournies, 21 lignes au début sont exclues faute d’historique mensuel et 22 à la fin faute de cible complète à 22 séances. Les trois horizons utilisent donc les mêmes lignes. Il ne s’agit pas d’un échantillon maximal distinct pour chaque horizon.
 
-## 5. Corrélations observées avec les cibles
+## 5. Protocole de l’équipe pour les modèles ultérieurs
 
-Les corrélations de Pearson entre variables explicatives et cibles sont les suivantes.
+La période de test commence le **1er janvier 2015**. Les mesures prévues sont **MSE et QLIKE**, selon les conventions d’évaluation de l’équipe. Le notebook T5 prépare les variables et décrit leurs corrélations ; il ne réalise aucun entraînement ni évaluation de modèle.
+
+La séparation des dates doit également tenir compte des fenêtres cibles. Une observation d’entraînement n’est utilisable que si sa dernière séance cible précède strictement le début du test. Il faut donc purger les lignes d’entraînement qui empiètent sur le test, séparément pour chaque horizon. Un découpage par la seule date t ne suffit pas. La sélection de variables et les transformations estimées doivent aussi se limiter à l’entraînement.
+
+Les anciennes comparaisons LightGBM fondées sur un découpage 80/20 et sur MAE/RMSE ne font pas partie des livrables validés. Aucun gain de 22,8 % n’est retenu. Les essais correspondants et leurs anciennes sorties ont été retirés du notebook.
+
+## 6. Corrélations descriptives recalculées
+
+Corrélations de Pearson sur l’ensemble des lignes conservées, arrondies à trois décimales. Elles incluent la période de test prévue : elles sont descriptives et ne doivent pas servir à sélectionner un modèle hors échantillon.
 
 | Variable | SPX y_h1 | SPX y_h5 | SPX y_h22 | TSX y_h1 | TSX y_h5 | TSX y_h22 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -55,45 +62,34 @@ Les corrélations de Pearson entre variables explicatives et cibles sont les sui
 | ret | -0.187 | -0.187 | -0.129 | -0.137 | -0.175 | -0.122 |
 | ret_neg | -0.427 | -0.446 | -0.365 | -0.344 | -0.410 | -0.331 |
 | vix | 0.601 | 0.682 | 0.624 | 0.480 | 0.569 | 0.514 |
+| vix_diff | 0.166 | 0.152 | 0.100 | 0.110 | 0.121 | 0.087 |
 
-La volatilité hebdomadaire rv_w présente la corrélation positive la plus forte avec y_h5 pour les deux marchés.
+`rv_w` présente la corrélation la plus élevée avec `y_h5` parmi ces variables dans les deux marchés : 0,724 pour SPX et 0,743 pour TSX. La corrélation de `vix_diff` avec `y_h5` est de 0,152 pour SPX et de 0,121 pour TSX. Ces associations ne mesurent pas une amélioration de prévision hors échantillon.
 
-Les rendements négatifs sont associés à une volatilité future plus élevée. La corrélation négative de ret_neg doit être interprétée en tenant compte du fait que cette variable est négative ou nulle.
+La corrélation négative de `ret_neg` doit se lire avec son signe : une valeur plus négative, donc une baisse plus forte de l’indice, est associée à une cible plus élevée. Cette observation ne démontre pas à elle seule un effet causal.
 
-Ces corrélations décrivent des associations statistiques et ne démontrent pas de relation causale.
+## 7. Exécution et contrôles sur les fichiers fournis
 
-## 6. Vérifications et limites
+| Élément | SPX | TSX |
+|---|---:|---:|
+| Observations sources | 6 733 | 6 713 |
+| Observations conservées | 6 690 | 6 670 |
+| Observations retirées | 43 | 43 |
+| Première date conservée | 2000-02-03 | 2000-02-03 |
+| Dernière date conservée | 2026-09-10 | 2026-09-09 |
+| Variables explicatives | 7 | 7 |
+| Cibles | 3 | 3 |
+| Colonnes numériques hors Date | 10 | 10 |
+| Colonnes du CSV avec Date | 11 | 11 |
 
-- Les fichiers de variables ont été générés avec 6 690 observations pour SPX et 6 670 pour TSX, et 9 colonnes chacun.
-- Les résultats de corrélation et les tests anti-fuite ont été obtenus dans Google Colab.
-- Les observations sans cible future complète doivent être retirées pour l'horizon concerné.
-- Les valeurs manquantes doivent être contrôlées.
-- La disponibilité réelle des valeurs VIX à la date de prévision doit être vérifiée.
-- Les résultats de prédiction doivent être validés sur une période hors échantillon et idéalement avec une validation chronologique glissante.
+Les CSV régénérés ne contiennent aucune valeur manquante ni infinie. Les dates sont uniques et croissantes. Les contrôles comparent les sept variables aux calculs attendus et les trois cibles aux moyennes des observations strictement futures, sur toutes les lignes conservées. Un contrôle supplémentaire modifie des valeurs après une date médiane et vérifie que les variables explicatives antérieures ne changent pas. La relecture des CSV exportés reproduit les valeurs des tableaux calculés.
 
-## 7. Conclusion
+Ces contrôles valident la construction temporelle du notebook sur les fichiers fournis. Ils ne démontrent pas l’absence de révisions des sources ou la disponibilité historique exacte du VIX à l’heure de prévision. Ces éléments relèvent de la qualité et de l’alignement des sources.
 
-Les variables explicatives et les cibles sont construites pour les deux indices. Les corrélations confirment l'intérêt des mesures historiques de volatilité, notamment rv_w, pour la prévision à cinq jours.
+## 8. Relancer le notebook
 
-Les fichiers CSV constituent les livrables de préparation des données du T5. Les comparaisons de modèles LightGBM réalisées ensuite sont des analyses complémentaires.
-# Variables utilisées par les modèles
+Depuis le dossier `notebooks`, le notebook utilise `../data`. Depuis la racine du dépôt, il utilise `data`. Aucun chemin personnel `/content/spx.csv` n’est imposé.
 
-Règle : chaque variable doit être connue à la clôture du jour t.
-Sinon on utiliserait le futur (look-ahead).
+Dans Colab, si les deux fichiers sources sont absents, le notebook propose leur import et les enregistre dans un dossier `data`. Exécuter les cellules dans l’ordre pour créer les variables, contrôler les calculs, afficher les corrélations et exporter les deux fichiers. La dernière cellule permet de télécharger les CSV depuis Colab.
 
-| Variable | Définition | Connue à la clôture de t ? |
-|---|---|---|
-| rv_d | rv du jour t | Oui |
-| rv_w | moyenne de rv de t-4 à t (5 jours) | Oui |
-| rv_m | moyenne de rv de t-21 à t (22 jours) | Oui |
-| ret | rendement du jour t, en % | Oui |
-| ret_neg | min(ret, 0), seulement les jours de baisse | Oui |
-| vix | niveau du VIX à la clôture de t | Oui |
-| vix_diff | vix du jour t moins vix de la veille | Oui |
-
-## Pourquoi ces variables
-
-- rv_d, rv_w, rv_m : la volatilité est persistante (base du modèle HAR).
-- ret_neg : une baisse augmente la volatilité plus qu'une hausse de même taille (effet de levier).
-- vix : c'est l'anticipation du marché sur la volatilité à venir.
-- vix_diff : une montée soudaine du VIX signale une peur qui augmente.
+Les résultats de cette documentation proviennent d’une exécution du notebook corrigé sur les sources fournies. Le SPX a été récupéré dans le tableau `rawLines` complet de la page GitHub HTML transmise, contenant 6 734 lignes dont l’en-tête. Le fichier TSX transmis sous le nom `tsx 2.csv` a été utilisé comme `tsx.csv`, sans changement des données.
