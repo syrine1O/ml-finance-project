@@ -88,6 +88,6 @@ Ces contrôles valident la construction temporelle du notebook sur les fichiers 
 
 ## 8. Relancer le notebook
 
-1. Ouvrir `notebooks/05a_features.ipynb` dans Google Colab.
-2. Mettre à disposition les données nécessaires aux chemins indiqués dans le notebook.
-3. Exécuter les cellules dans l’ordre pour régénérer les variables et les fichiers CSV.
+Depuis le dossier `notebooks`, le notebook utilise `../data`. Depuis la racine du dépôt, il utilise `data`. Aucun chemin personnel `/content/spx.csv` n’est imposé.
+
+Dans Colab, si les deux fichiers sources sont absents, le notebook propose leur import et les enregistre dans un dossier `data`. Exécuter les cellules dans l’ordre pour créer les variables, contrôler les calculs, afficher les corrélations et exporter les deux fichiers. La dernière cellule permet de télécharger les CSV depuis Colab.
