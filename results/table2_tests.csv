@@ -1,0 +1,11 @@
+Indice,Test,Statistique,p-value,Décision à 5 %
+S&P 500,ADF log-prix,1.0769000117932914,0.9950145708303682,Non-rejet de H0
+S&P 500,ADF rendements,-19.50738584690919,0.0,Rejet de H0
+S&P 500,Ljung-Box ret — 10 retards,97.13183050226354,2.0403314937632912e-16,Rejet de H0
+S&P 500,Ljung-Box ret² — 10 retards,6151.933904207523,0.0,Rejet de H0
+S&P 500,ARCH-LM — 5 retards,1689.2661646222355,0.0,Rejet de H0
+S&P/TSX,ADF log-prix,0.23930138783456226,0.9743817203491756,Non-rejet de H0
+S&P/TSX,ADF rendements,-14.800531854823154,2.1029400628919548e-27,Rejet de H0
+S&P/TSX,Ljung-Box ret — 10 retards,59.72780090216154,4.0805003898390265e-09,Rejet de H0
+S&P/TSX,Ljung-Box ret² — 10 retards,6551.273254683705,0.0,Rejet de H0
+S&P/TSX,ARCH-LM — 5 retards,1672.2368746776642,0.0,Rejet de H0
