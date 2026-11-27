@@ -28,6 +28,10 @@ pip install jupyterlab
 
 Pour travailler : `conda activate mlfin`, puis `jupyter lab`.
 
+## Ordre d'exécution des notebooks
+
+`01_donnees` → `05a_features` → `02_exploration` → `04_har` → `04b_log_har` → `03b_garch_multi` → `05_lightgbm_T11` → `06_resultats`. Chaque notebook de modèle écrit ses prévisions dans `results/` ; `06_resultats` les rassemble, produit les tables 4 et 6, les tests directs et la figure 5.
+
 ## Format des données
 
 Colonnes de `data/spx.csv` et `data/tsx.csv` : `Date, open, high, low, close, ret, rv, vix`
