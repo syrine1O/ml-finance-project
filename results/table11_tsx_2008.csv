@@ -1,0 +1,16 @@
+horizon,modèle,QLIKE_original,QLIKE_winsorisé,variation_%,DM,p-value
+1,HAR,0.3416,0.3272,-4.2149,,
+1,LOGHARX,0.3024,0.3023,-0.007,,
+1,LGBM,0.2968,0.297,0.0615,,
+1,DM LGBM vs HAR (winsorisé),,,,-5.859,0.0
+1,DM LGBM vs LOGHARX (winsorisé),,,,-1.414,0.1574
+5,HAR,0.2384,0.2221,-6.813,,
+5,LOGHARX,0.1952,0.1952,0.0062,,
+5,LGBM,0.1959,0.1963,0.2034,,
+5,DM LGBM vs HAR (winsorisé),,,,-3.6971,0.0002
+5,DM LGBM vs LOGHARX (winsorisé),,,,0.1925,0.8473
+22,HAR,0.3418,0.3286,-3.8571,,
+22,LOGHARX,0.3616,0.3616,-0.0097,,
+22,LGBM,0.3646,0.3622,-0.6447,,
+22,DM LGBM vs HAR (winsorisé),,,,0.4631,0.6433
+22,DM LGBM vs LOGHARX (winsorisé),,,,0.0362,0.9711

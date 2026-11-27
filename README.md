@@ -30,7 +30,9 @@ Pour travailler : `conda activate mlfin`, puis `jupyter lab`.
 
 ## Ordre d'exécution des notebooks
 
-`01_donnees` → `05a_features` → `02_exploration` → `04_har` → `04b_log_har` → `03b_garch_multi` → `05_lightgbm_T11` → `06_resultats`. Chaque notebook de modèle écrit ses prévisions dans `results/` ; `06_resultats` les rassemble, produit les tables 4 et 6, les tests directs et la figure 5.
+`01_donnees` → `05a_features` → `02_exploration` → `04_har` → `04b_log_har` → `03b_garch_multi` → `05_lightgbm_T11` → `06_resultats` → `07_robustesse`.
+
+Chaque notebook de modèle écrit ses prévisions dans `results/` ; `06_resultats` les rassemble et produit les tables 4 et 6, les tests directs et la figure 5 ; `07_robustesse` ajoute les tests complémentaires (tables 7 à 12, figure 6) sans modifier les résultats principaux. `03_garch` est le notebook exploratoire du GARCH à h = 1 (figure 4, table 3b) ; il n'écrit pas de prévisions. `00_tests_utils` teste `src/utils.py`. Les anciens essais sont dans `notebooks/archive/` et ne doivent pas être relancés.
 
 ## Format des données
 
